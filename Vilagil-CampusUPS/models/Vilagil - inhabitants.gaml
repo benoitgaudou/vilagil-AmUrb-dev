@@ -124,7 +124,7 @@ species people skills: [moving] {
 	}	
 }
 
-experiment pep parent: "GISdata" {
+experiment interactive parent: "GISdata" {
 	parameter "Nombre d'habitant par étage" var: nb_people_per_flat  <- 10;
 	parameter "Step duration" var: step among: [10#mn, 1#mn, 10#s, 1#s];
 	parameter "Avec congestion" var: with_congestion ;
