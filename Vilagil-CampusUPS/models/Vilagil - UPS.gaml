@@ -10,12 +10,14 @@ model VilagilUPS
 // import "Vilagil - inhabitants.gaml"
 
 global {
-	image_file satellite_img <- image_file("../includes/satellite.png");
-
-	shape_file boundary_shp <- shape_file("../includes/boundary.shp");
-	shape_file roads_shp <- shape_file("../includes/roads.shp");
-	shape_file buildings_shp <- shape_file("../includes/buildings.shp");
-	shape_file waters_shp <- shape_file("../includes/waters.shp");
+	string area <- "campusUT3";
+	string includes_folder <- "../includes/"+area+"/";
+	
+	image_file satellite_img <- image_file(includes_folder+"satellite.png");
+	shape_file boundary_shp <- shape_file(includes_folder+"boundary.shp");
+	shape_file roads_shp <- shape_file(includes_folder+"roads.shp");
+	shape_file buildings_shp <- shape_file(includes_folder+"buildings.shp");
+	shape_file waters_shp <- shape_file(includes_folder+"waters.shp");
 
 	geometry shape <-  envelope(boundary_shp);
 	graph the_graph;
