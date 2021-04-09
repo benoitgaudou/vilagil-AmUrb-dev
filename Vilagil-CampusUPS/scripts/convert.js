@@ -6,8 +6,8 @@ var output_path = process.argv[3];
 
 shp2stl.shp2stl(input_path,
 	{
-		width: 1110, //in STL arbitrary units, but typically 3D printers use mm
-		height: 25,
+		width: 160, //in STL arbitrary units, but typically 3D printers use mm
+		height: 50,
 		extraBaseHeight: 0,
 		extrudeBy: "height",
 		simplification: 0,

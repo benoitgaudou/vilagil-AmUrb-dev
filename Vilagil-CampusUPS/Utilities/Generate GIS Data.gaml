@@ -22,8 +22,10 @@ global {
 	 * ------------------------------------------------------------------
 	 */
 	//define the path to the dataset folder
-	string dataset_path <- "../includes/from_OSM";	
-	string dataset_path_bound <- "../includes";	
+	// string dataset_path <- "../includes/from_OSM";	
+	// 	string dataset_path_bound <- "../includes";	
+	string dataset_path <- "../includes/from_OSM_UT3_IRIT";	
+	string dataset_path_bound <- "../includes/from_OSM_UT3_IRIT";	
 		
 	//mandatory: define the bounds of the studied area
 	file data_file <-shape_file(dataset_path_bound + "/boundary.shp");

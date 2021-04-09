@@ -62,7 +62,7 @@ species roadSimple {
 	}
 		
 	aspect default {
-		draw shape + 5 color: #black;
+		draw shape + 5 color: #white;
 	}
 	
 	aspect simple {
@@ -128,7 +128,7 @@ species building {
 	}
 	
 	aspect simple {
-		draw shape /*- (shape - 3)*/ color: #grey ;
+		draw shape /*- (shape - 3)*/ color: #grey border: #black ;
 	}
 }
 

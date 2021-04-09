@@ -149,9 +149,9 @@ experiment interactive parent: "GISdata" {
 }
 
 experiment multi parent: "GISdata" {
-	parameter "Nombre d'habitant par étage" var: nb_people_per_flat  <- 10;
+	parameter "Number of inhabitant / step" var: nb_people_per_flat  <- 10;
 	parameter "Step duration" var: step among: [10#mn, 1#mn, 10#s, 1#s] <- 1#mn;
-	parameter "Avec congestion" var: with_congestion <-  false;
+	parameter "With congestion?" var: with_congestion <-  false;
 	
 	init {
 	//	create simulation with:[nb_people_per_flat::10,with_congestion::true,step::1];

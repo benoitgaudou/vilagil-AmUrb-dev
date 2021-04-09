@@ -11,33 +11,52 @@ model Merge2print
 /* Insert your model definition here */
 
 global {
-
-	shape_file buildings0_shape_file <- shape_file("../includes/buildings.shp");
-	shape_file roads0_shape_file <- shape_file("../includes/roads.shp");
-	shape_file boundary0_shape_file <- shape_file("../includes/boundary.shp");
-	shape_file waters0_shape_file <- shape_file("../includes/waters.shp");
+	string area <- "campusUT3-IRIT";
+	string includes_folder <- "../includes/"+area+"/";
+	
+	shape_file boundary0_shape_file <- shape_file(includes_folder+"boundary.shp");
+	shape_file roads0_shape_file <- shape_file(includes_folder+"roads.shp");
+	shape_file buildings0_shape_file <- shape_file(includes_folder+"buildings.shp");
+	shape_file waters0_shape_file <- (file_exists(includes_folder+"waters.shp")) ? shape_file(includes_folder+"waters.shp") : nil;
 
 	geometry shape <- envelope(boundary0_shape_file);
 	
+	float level_height <- 32.0; // #mm
+	float road_buffer <- 2.0;
+	float road_height <- 0.3;
+	float ground_height <- 0.5;
+	
+	bool use_level_for_height <- true;
+	
 	init {
 		create building from:buildings0_shape_file {
-			height <- 3.0;
+			if (levels > 0) and use_level_for_height {
+				height <- levels * level_height;
+			} else {
+				height <- 3.0;		
+			}
 		}
 		create road from: roads0_shape_file ;
 		
-		loop r over: road {
-			create building {
-				shape <- r.shape +2;
-				height <- 0.3;
+		// Road to dig 
+		// list<road> road_to_dig <- road;
+		list<road> road_to_dig <- road where(each.type = "residential");
+		
+		loop r over: road_to_dig {
+			create building  {
+				shape <- (r.shape + road_buffer) inter world.shape ;
+				height <- road_height;
 			}
 		}
 		
-		create  water from: waters0_shape_file;
-		loop w over: water {
-			create building {
-				shape <- w.shape;
-				height <- 0.3;
-			}
+		if(waters0_shape_file != nil){
+			create water from: waters0_shape_file;
+			loop w over: water {
+				create building {
+					shape <- w.shape;
+					height <- road_height;
+				}
+			}	
 		}
 		
 		list<building> true_buildings <- list<building>(building) ;
@@ -59,9 +78,12 @@ global {
 }
 
 species building {
+	int levels;
 	float height ;
 }
-species road {}
+species road {
+	string type;
+}
 species water{}
 
 
