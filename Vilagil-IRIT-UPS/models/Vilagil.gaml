@@ -75,7 +75,7 @@ species building {
 	float height;
 	int flats;
 	int levels;
-	rgb color <- (type = "canteen") ? #darkred : #darkgrey;
+	rgb color <- (type = "canteen") ? #darkred : ((type = "residential") ? #grey : #darkgrey);
 	
 	user_command "add 1 étage" action: increase_by_one_flat;
 	user_command "add N étage" action: increase_flats;
