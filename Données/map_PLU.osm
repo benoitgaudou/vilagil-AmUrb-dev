@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PLU>
+	<zone designation=1>
+		<info param1="1" param2="15" param3="7" param4="5">
+			<gps type="polygon">
+				<nd lat="43.562970" lon="1.455812"/>
+				<nd lat="43.565140" lon="1.460008"/>
+				<nd lat="43.563167" lon="1.460928"/>
+				<nd lat="43.561074" lon="1.456739"/>
+			</gps>
+		</info>
+	</zone>
+
+	<zone designation=2>
+		<info param1="3" param2="15" param3="7" param4="5">
+			<gps type="polygon">
+				<nd lat="43.5735" lon="1.44623"/>
+				<nd lat="43.57315" lon="1.44677"/>
+				<nd lat="43.57232" lon="1.44562"/>
+				<nd lat="43.57223" lon="1.44500"/>
+				<nd lat="43.57265" lon="1.44423"/>
+				<nd lat="43.57330" lon="1.44521"/>
+				<nd lat="43.57325" lon="1.44581"/>
+			</gps>
+		</info>
+	</zone>
+				
+</PLU>
