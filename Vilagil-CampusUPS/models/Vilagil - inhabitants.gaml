@@ -10,7 +10,12 @@ model Vilagilinhabitants
 
 import "Vilagil - UPS.gaml"
 
-global {
+global skills: [network]{
+	
+	// Network configuration //
+	// MQTT Broker adress //
+	string mqtt_broker <- "localhost";
+	string sender_name <- "Simple Traffic";
 	
 	int nb_people_per_flat  <- 10;
 	bool with_congestion <- false;
@@ -37,6 +42,9 @@ global {
 		do init_env;
 		residential_buildings <- building where (each.type="residential");
 		workingplaces <- building - residential_buildings;
+		
+		do connect to: mqtt_broker with_name: sender_name;
+		do sendBuilding;
 		
 		loop residence over: residential_buildings {
 			do create_people(nb_people_per_flat  * residence.flats, residence);		
@@ -85,6 +93,35 @@ global {
 	// @Override
 	action add_building_effects(building res) {
 		do create_people(nb_people_per_flat, res);					
+	}
+	
+	reflex doTo{
+		do sendOnce;
+	}
+	
+	action sendBuilding{
+		loop agt over: building {
+			string topic_path <- "static/buildings/"+agt.name+"/shape";
+			do send to:topic_path contents:serialize(agt.shape);	
+		}
+		
+	}
+	
+	action sendOnce{
+		map people__pos;
+		loop agt over: people {
+			add (agt.name)::(agt.location) to:people__pos;
+		}
+		do send to:"dynamic/agent/position" contents:serialize(people__pos);	
+		do send to:"dynamic/metric/peopleOnTheRoad" contents:people_on_the_road;
+	}
+	
+	species NetworkingAgent skills:[network]{
+		reflex fetch when:has_more_message()
+		{	
+			message mess <- fetch_message();
+			write name + " fecth this message: " + mess.contents;
+		}
 	}
 }
 
