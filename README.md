@@ -17,3 +17,14 @@ To  run the model:
 * Click on the green button:
   * `interactive` to launch the interactive simulation (you right click on the environnement to create building, on buildings to add floors ...
   *  `multi` to  launch the experiment comparing 3 simulations.
+
+To  run the webservice:
+* Install a mqtt broker (for example : https://mosquitto.org/download/)
+* Run the brocker
+* In your python environment, install the two following dependencies
+** pip install paho-mqtt
+** pip install -U Flask
+* To run the application, use the flask command or python -m flask. Before you can do that you need to tell your terminal the application to work with by exporting the FLASK_APP environment variable:
+** BASH: export FLASK_APP=hello   CMD : set FLASK_APP=hello   Powershell: $env:FLASK_APP = "hello"
+* Run the flask server
+** flask run
