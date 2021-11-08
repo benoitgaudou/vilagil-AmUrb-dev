@@ -20,11 +20,13 @@ To  run the model:
 
 To  run the webservice:
 * Install a mqtt broker (for example : https://mosquitto.org/download/)
-* Run the brocker
+* Run the brocker (for example: mosquitto.exe)
 * In your python environment, install the two following dependencies
-** pip install paho-mqtt
-** pip install -U Flask
+  * pip install paho-mqtt
+  * pip install -U Flask
 * To run the application, use the flask command or python -m flask. Before you can do that you need to tell your terminal the application to work with by exporting the FLASK_APP environment variable:
-** BASH: export FLASK_APP=hello   CMD : set FLASK_APP=hello   Powershell: $env:FLASK_APP = "hello"
+  * BASH: export FLASK_APP=hello   
+  * CMD : set FLASK_APP=hello   
+  * Powershell: $env:FLASK_APP = "hello"
 * Run the flask server
-** flask run
+  * flask run
