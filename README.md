@@ -28,5 +28,5 @@ To  run the webservice:
   * BASH: export FLASK_APP=hello   
   * CMD : set FLASK_APP=hello   
   * Powershell: $env:FLASK_APP = "hello"
-* Run the flask server
+* Run the flask server (https://flask.palletsprojects.com/en/2.0.x/)
   * flask run
