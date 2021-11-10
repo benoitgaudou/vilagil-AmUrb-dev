@@ -97,9 +97,9 @@ global skills: [network]{
 	
 	reflex doTo{
 		do sendOnce;
-		if current_date.minute = 0 {
-			
-		}
+//		if current_date.minute = 0 {
+//			
+//		}
 	}
 	
 	action sendBuilding{
