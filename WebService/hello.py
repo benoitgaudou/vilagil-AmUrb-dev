@@ -6,7 +6,6 @@ app = Flask(__name__)
 
 @app.route("/peopleOnTheRoad")
 def hello_world():
-    print( mqtt_client.__model.__getData__("peopleOnTheRoad"))
     nbPeople = mqtt_client.__model.__getData__("peopleOnTheRoad")
 
     data = {
@@ -15,6 +14,16 @@ def hello_world():
 
     return jsonify(data)
 
-@app.route("/hello")
-def hello_world2():
-    return "<p>Hello, World! ^^</p>"
+@app.route("/occupation/<id>")
+def hello_world2(id):
+    nbPeople = mqtt_client.__model.__getData__(str(id))
+
+    data = {
+        "occupation": nbPeople,
+    }
+
+    return jsonify(data)
+
+@app.route("/")
+def acceuil_chalereux():
+    return "Coucou petite perruche"

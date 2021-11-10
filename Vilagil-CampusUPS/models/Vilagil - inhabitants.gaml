@@ -21,7 +21,7 @@ global skills: [network]{
 	bool with_congestion <- false;
 	
 	float step <- 10 #mn;
-	date starting_date <- date("05 23 20","HH mm ss");
+	date starting_date <- date("05 20 20","HH mm ss");
 	int min_work_start <- 6;
 	int max_work_start <- 8;
 	int min_work_end <- 16; 
@@ -97,6 +97,9 @@ global skills: [network]{
 	
 	reflex doTo{
 		do sendOnce;
+		if current_date.minute = 0 {
+			
+		}
 	}
 	
 	action sendBuilding{
@@ -105,6 +108,18 @@ global skills: [network]{
 			do send to:topic_path contents:serialize(agt.shape);	
 		}
 		
+	}
+	
+	reflex sendOccupation when:every(24#hour){
+		loop agt over: building {
+			string topic_path <- "dynamic/buildings/occupation/"+agt.name;
+			string str <- "";
+			loop i from: 0 to: 23{
+				str <- str + agt.building_occupation[i]+" ";
+			} 
+			write str;
+			do send to:topic_path contents:str;
+		}
 	}
 	
 	action sendOnce{
