@@ -7,7 +7,7 @@
 
 model VilagilUPS
 
-// import "Vilagil - inhabitants.gaml"
+ import "Vilagil - inhabitants.gaml"
 
 global {
 	string includes_folder <- "../includes/";
@@ -77,11 +77,24 @@ species building {
 	int levels;
 	rgb color <- (type = "canteen") ? #darkred : ((type = "residential") ? #grey : #darkgrey);
 	
+	list<people> agents_in_building_current_hour <- [];
+	map<int,int> building_occupation <- map<int, int>([]);
+	
 	user_command "add 1 étage" action: increase_by_one_flat;
 	user_command "add N étage" action: increase_flats;
 	user_command "Destroy 1 étage" action: destroy_one_flat;
 	user_command "Destroy N étage" action: destroy_flats;
-	
+
+	reflex people_in_building {
+		agents_in_building_current_hour <- agents_in_building_current_hour + people where(self covers each);
+	}
+
+	reflex compute_agents when:every(1#hour){	
+		agents_in_building_current_hour <- remove_duplicates(agents_in_building_current_hour);
+		add length(agents_in_building_current_hour) to: building_occupation at: current_date.hour;
+		agents_in_building_current_hour <- [];
+	}
+			
 	action increase_by_one_flat {
 		flats  <- flats + 1;
 		ask world {
