@@ -29,6 +29,7 @@ global skills: [network]{
 	float min_speed <- 1.0 #km / #h;
 	float max_speed <- 5.0 #km / #h; 
 	graph the_graph;
+	bool first <- true;
 	
 	list<building> residential_buildings;
 	list<building> workingplaces;
@@ -118,7 +119,9 @@ global skills: [network]{
 				str <- str + agt.building_occupation[i]+" ";
 			} 
 			write str;
-			do send to:topic_path contents:str;
+			if current_date != date("05 20 20","HH mm ss"){
+				do send to:topic_path contents:str;
+			}
 		}
 	}
 	
