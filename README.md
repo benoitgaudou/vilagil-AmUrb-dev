@@ -30,3 +30,6 @@ To  run the webservice:
   * Powershell: $env:FLASK_APP = "hello"
 * Run the flask server (https://flask.palletsprojects.com/en/2.0.x/)
   * flask run
+
+To make a post requests:
+* You must send a message to the 'mailbox' topic. The different possible requests are documented in the mqtt_client.py file

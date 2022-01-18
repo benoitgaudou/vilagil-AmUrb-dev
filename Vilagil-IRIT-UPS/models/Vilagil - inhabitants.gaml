@@ -30,6 +30,7 @@ global skills: [network]{
 	float max_speed <- 5.0 #km / #h; 
 	graph the_graph;
 	bool first <- true;
+	float pas <- float(eval_gaml('1#hour'));
 	
 	list<building> residential_buildings;
 	list<building> workingplaces;
@@ -98,25 +99,28 @@ global skills: [network]{
 	
 	reflex doTo{
 		do sendOnce;
-//		if current_date.minute = 0 {
-//			
-//		}
 	}
 	
 	action sendBuilding{
+		list<string> buildingName;
 		loop agt over: building {
+			buildingName <- buildingName + agt.name;
 			string topic_path <- "static/buildings/"+agt.name+"/shape";
 			do send to:topic_path contents:serialize(agt.shape);	
 		}
-		
+		do send to:"static/buildings/list" contents:buildingName;
 	}
 	
 	reflex sendOccupation when:every(24#hour){
 		loop agt over: building {
 			string topic_path <- "dynamic/buildings/occupation/"+agt.name;
 			string str <- "";
-			loop i from: 0 to: 23{
-				str <- str + agt.building_occupation[i]+" ";
+			loop i from: 0 to: int(24#h/pas) - 1{
+//				write int(320 + i*int(pas)/60) mod 1440;
+//				write agt.building_occupation;
+				if agt.building_occupation[int(320 + i*int(pas)/60) mod 1440] is int{
+					str <- str + agt.building_occupation[int(320 + i*int(pas)/60) mod 1440]+" ";
+				}
 			} 
 			write str;
 			if current_date != date("05 20 20","HH mm ss"){
@@ -134,11 +138,44 @@ global skills: [network]{
 		do send to:"dynamic/metric/peopleOnTheRoad" contents:people_on_the_road;
 	}
 	
-	species NetworkingAgent skills:[network]{
-		reflex fetch when:has_more_message()
-		{	
+	reflex fetch when:has_more_message(){	
 			message mess <- fetch_message();
 			write name + " fecth this message: " + mess.contents;
+	}
+	
+	species NetworkingAgent skills:[network]{
+		
+		init {
+			do connect to: mqtt_broker with_name: "mailbox";
+		}
+		
+		reflex fetch when:has_more_message(){
+			message mess <- fetch_message();
+			list content <- split_with(string(mess.contents), ' ');
+			if 'changeColor' in content{
+				ask building where(each.name=content[1]){
+					color <- content[2] as rgb;
+				}
+			}
+			if 'changeNbFlats' in content{
+				ask building where(each.name=content[1]){
+					do increase_by_n_flat(int(content[2]));
+				}
+			}
+			if 'changeSteps' in content{
+				ask building {
+					building_occupation <- map<int, int>([]);
+				}
+				pas <- float(eval_gaml(content[1]));
+			}
+			if 'changePeopleFlats' in content{
+				ask building where(each.name=content[1]){
+					ask world {
+						do add_flats_effects(int(content[2]),myself);
+					}
+				}
+			}
+			write name + " fecth this message: " + content;
 		}
 	}
 }

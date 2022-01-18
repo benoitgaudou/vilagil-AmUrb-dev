@@ -14,12 +14,32 @@ def hello_world():
 
     return jsonify(data)
 
+@app.route("/buildingList")
+def hello_world3():
+    l = mqtt_client.__model.__getData__("buildingList")
+
+    data = {
+        "buildingList": l,
+    }
+
+    return jsonify(data)
+
 @app.route("/occupation/<id>")
 def hello_world2(id):
     nbPeople = mqtt_client.__model.__getData__(str(id))
 
     data = {
         "occupation": nbPeople,
+    }
+
+    return jsonify(data)
+
+@app.route("/mailbox")
+def mailbox():
+    message = mqtt_client.__model.__getData__("mailbox")
+
+    data = {
+        "mailbox": message,
     }
 
     return jsonify(data)

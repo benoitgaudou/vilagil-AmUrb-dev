@@ -30,7 +30,7 @@ global {
 		create building from: buildings_shp;
 		create parcel from: parcel_shp;
 		create zonePLU from: zonePLU_shp;
-		
+		create NetworkingAgent number: 1;
 		the_graph <- as_edge_graph(roadSimple);				
 	}
 	
@@ -89,9 +89,9 @@ species building {
 		agents_in_building_current_hour <- agents_in_building_current_hour + people where(self covers each);
 	}
 
-	reflex compute_agents when:every(1#hour){	
+	reflex compute_agents when:every(pas){	
 		agents_in_building_current_hour <- remove_duplicates(agents_in_building_current_hour);
-		add length(agents_in_building_current_hour) to: building_occupation at: current_date.hour;
+		add length(agents_in_building_current_hour) to: building_occupation at: current_date.hour*60 + current_date.minute;
 		agents_in_building_current_hour <- [];
 	}
 			
@@ -99,6 +99,13 @@ species building {
 		flats  <- flats + 1;
 		ask world {
 			do add_flats_effects(1,myself);
+		}
+	}
+	
+	action increase_by_n_flat(int n){
+		flats  <- flats + n;
+		ask world {
+			do add_flats_effects(n,myself);
 		}
 	}
 	
