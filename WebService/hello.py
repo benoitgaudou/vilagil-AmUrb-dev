@@ -44,6 +44,12 @@ def mailbox():
 
     return jsonify(data)
 
+@app.route("/mailbox/<msg>")
+def mailboxMsg(msg):
+    mqtt_client.client.publish("mailbox",str(msg).replace("&"," "))
+
+    return "Message Sent"
+
 @app.route("/")
 def acceuil_chalereux():
     return "Coucou petite perruche"
