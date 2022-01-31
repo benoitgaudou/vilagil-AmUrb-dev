@@ -1,4 +1,4 @@
-from flask import Flask,jsonify
+from flask import Flask,jsonify, request
 
 import  mqtt_client
 
@@ -36,13 +36,29 @@ def hello_world2(id):
 
 @app.route("/mailbox")
 def mailbox():
-    message = mqtt_client.__model.__getData__("mailbox")
+    type = request.args.get('type')
+    data1 = request.args.get('data1')
+    data2 = request.args.get('data2')
+    if type == None: 
+        message = mqtt_client.__model.__getData__("mailbox")
 
-    data = {
-        "mailbox": message,
-    }
+        data = {
+            "mailbox": message,
+        }
 
-    return jsonify(data)
+        return jsonify(data)
+    elif data2 == None:
+        if type == "changeSteps":
+            timeStep = ''.join(filter(lambda x: x.isdigit(), data1)) + "#" + ''.join(filter(lambda x: not x.isdigit(), data1))
+            mqtt_client.client.publish("mailbox",str(type + " " + timeStep))
+        else :
+            mqtt_client.client.publish("mailbox",str(type + " " + data1))
+
+        return "Message Sent"
+    else :
+        mqtt_client.client.publish("mailbox",str(type + " " + data1 + " " + data2))
+
+        return "Message Sent"
 
 @app.route("/mailbox/<msg>")
 def mailboxMsg(msg):

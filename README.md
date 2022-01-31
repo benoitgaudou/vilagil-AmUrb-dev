@@ -33,3 +33,4 @@ To  run the webservice:
 
 To make a post requests:
 * You must send a message to the 'mailbox' topic. The different possible requests are documented in the mqtt_client.py file
+* You now can do some POST request like this one : 'http://127.0.0.1:5000/mailbox?type=changeColor&data1=building3&data2=blue' or 'http://127.0.0.1:5000/mailbox?type=changeSteps&data1=30minutes'
