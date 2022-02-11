@@ -63,6 +63,7 @@ species people skills: [moving] {
 		list possibleEntity <- where(of_generic_species(agents, environnement_entity), in(Act, each.actions) and each != final_destination);
 		if Act = "goOut"{
 			final_destination <- one_of(where(FluxGen, each.location != location));
+			arrivee <- any_location_in(final_destination);
 		} else {
 			final_destination <- one_of(where(possibleEntity, each.fNeed = (possibleEntity max_of each.fNeed)));
 			arrivee <- any_location_in(final_destination);
