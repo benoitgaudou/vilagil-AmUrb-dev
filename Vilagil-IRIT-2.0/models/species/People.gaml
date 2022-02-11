@@ -23,13 +23,19 @@ species people skills: [moving] {
 		do goto on:the_graph target:arrivee;
 	}
 	
-	reflex helpStepBroIMStuck when: current_edge = nil {
-		do die;
-	}
+//	reflex helpStepBroIMStuck when: current_edge = nil {
+//		do die;
+//	}
 	
 	reflex tictac when: location = arrivee and !(final_destination is FluxGen) {
-		if final_destination in car {
+		if final_destination in car  {
 			ask final_destination as car{
+				do vroom;
+			}
+			do die;
+		}
+		if final_destination in bicycle  {
+			ask final_destination as bicycle{
 				do vroom;
 			}
 			do die;
@@ -53,10 +59,7 @@ species people skills: [moving] {
 //		write of_generic_species(agents, environnement_entity) sum_of each.actions;
 		list listALaMano <- [];
 		ask of_generic_species(agents, environnement_entity){
-			if self is greenSpace and fNeed = 0 {}
-			else {
-				listALaMano <- listALaMano + actions;
-			}
+			listALaMano <- listALaMano + actions;
 		}
 		currentAction <- one_of(remove_duplicates(listALaMano));
 		do choose_entity (currentAction);

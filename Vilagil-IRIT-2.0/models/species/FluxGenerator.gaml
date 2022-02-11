@@ -14,6 +14,7 @@ import "People.gaml"
 
 global {
 	graph the_graph;
+	graph car_graph;
 	
 	init {
 		create building from: shape_file("../includes/Vilagil/building.shp");
@@ -22,23 +23,30 @@ global {
 			if type = "parking" {
 				create parkingPlace from: to_squares(self.shape, 5);
 			}
+			if type = "bicycle_parking" {
+				create bicyclePlace from: to_squares(self.shape, 2);
+			}
 		}
 		create road from: shape_file("../includes/Vilagil/road_cleaned.shp");
 		the_graph <- as_edge_graph(road);
+		car_graph <- as_edge_graph( where(road, each.type = "residential"));
 		create FluxGen from: shape_file("../includes/pointsflux/pointsFlux.shp");
-		ask FluxGen where(each.name = "FluxGen6" or each.name = "FluxGen8"){
+		ask FluxGen where(each.name = "FluxGen6" or each.name = "FluxGen8" or each.name = "FluxGen1"){
 			carCreator <- true;
 		}
-		ask greenSpace where(each.name = "greenspace3" or each.name = "greenspace4"){
+		ask greenSpace where(each.name = "greenSpace3"){
 			mayLunch <- true;
 		}
 	}
 }
 
+
+//A refaire en un seul reflex, peut être ?
 species FluxGen parent: environnement_entity{
 	bool carCreator <- false;
 	list affluencePeople <- [0,0,0,0,0,0,0,50,70,70,50,50,50,100,100,70,50,50,50,0,0,0,0,0];
 	list affluenceCar <- [0,0,0,0,0,0,0,4,10,10,5,0,10,10,5,5,5,5,0,0,0,0,0,0];
+	list affluenceCycle <- [0,0,0,0,0,0,0,2,3,5,10,0,5,5,2,3,2,0,0,0,0,0,0,0];
 	int calcAfflu;
 	list actions <- ["goOut"];
 		
@@ -70,6 +78,23 @@ species FluxGen parent: environnement_entity{
 			calcAfflu <- int(floor(affluenceCar[current_date.hour]/( 1 #h / step )));
 		}
 		create car number: calcAfflu{
+			location <- myself.location;
+			do parkMe;
+		}
+		calcAfflu <- 0;
+	}
+	
+	reflex cyclePop {
+		if affluenceCycle[current_date.hour]/( 1 #h / step )  < 1 {
+			if flip(affluenceCycle[current_date.hour]/( 1 #h / step )){
+				calcAfflu <- 1;
+			}
+		} else if flip( (affluenceCycle[current_date.hour] mod ( 1 #h / step ))/( 1 #h / step ) ) {
+			calcAfflu <- int(floor(affluenceCycle[current_date.hour]/( 1 #h / step ))) + 1 ;
+		} else {
+			calcAfflu <- int(floor(affluenceCycle[current_date.hour]/( 1 #h / step )));
+		}
+		create bicycle number: calcAfflu{
 			location <- myself.location;
 			do parkMe;
 		}
@@ -125,7 +150,7 @@ species car parent:environnement_entity skills:[moving]{
 	float timeSpentHere <- 0.0;
 	
 	reflex hitTheRoad when: isParked = false {
-		do goto on:the_graph target:arrivee;
+		do goto on:car_graph target:arrivee;
 		if arrivee = location {
 			if cible is FluxGen{
 				ask people where(each.final_destination = self){
@@ -182,6 +207,71 @@ species car parent:environnement_entity skills:[moving]{
 	}
 }
 
+species bicycle parent:environnement_entity skills:[moving]{
+	float speed <- float(one_of(range(5,12))) #km/#h;
+	bool isParked <- false;
+	agent cible;
+	point arrivee;
+	float timeSpentHere <- 0.0;
+	
+	reflex hitTheRoad when: isParked = false {
+		do goto on:the_graph target:arrivee;
+		if arrivee = location {
+			if cible is FluxGen{
+				ask people where(each.final_destination = self){
+					do wichActionIWannaDo;
+				}
+				do die;
+			}
+			if cible is amenity {
+				isParked <- true;
+				create people number: 1{
+					location <- myself.location;
+					do wichActionIWannaDo;
+				}
+			}
+		}
+	}
+	
+	reflex timeToGoHome{
+		if timeSpentHere > (cible as environnement_entity).averageTimeSpent {
+			actions <- ["drive"];
+			timeSpentHere <- 0.0;
+		} else {
+			timeSpentHere <- timeSpentHere + step;
+		}
+	}
+	
+	action parkMe {
+		cible <- one_of(where(bicyclePlace, each.availble = true));
+		if cible = nil {
+			do vroom;
+		} else {
+			ask cible as bicyclePlace {
+				availble <- false;
+			}
+		}
+		arrivee <- cible.location;
+	}
+	
+	action vroom {
+		actions <- [];
+		cible <- one_of(FluxGen);
+		arrivee <- cible.location;
+		isParked <- false;
+		attendance[current_date.hour] <- 0;
+		fNeed <- 0.0;
+		ask people where(each.final_destination = self){
+			do wichActionIWannaDo;
+		}
+	}
+	
+	aspect default
+	{
+		draw (isParked = true)?rectangle(1,2) + sphere(1):rectangle(1,2) color: #purple depth: 0.5;
+	}	
+}
+
 species building parent:environnement_entity{
 	int toManyPeople <- 50;
 	int flats <- 2;
@@ -199,6 +289,7 @@ species building parent:environnement_entity{
 
 species amenity parent:environnement_entity{
 	string type;
+	bool availble <- true;
 	
 	aspect default
 	{
@@ -211,12 +302,17 @@ species parkingPlace parent:environnement_entity {
 	float averageTimeSpent <- one_of([2 #h, 3 #h, 4 #h]);
 }
 
+species bicyclePlace parent:environnement_entity {
+	bool availble <- true;
+	float averageTimeSpent <- one_of([2 #h, 3 #h, 4 #h]);
+}
+
 species greenSpace parent:environnement_entity{
 	string type;
-	list actions <- ["lunch"];
 	list attendance <- [0,0,0,0,0,0,0,0,10,10,15,15,15,10,0,0,0,0,0,0,0,0,0,0];
 	bool mayLunch <- false;
 	float averageTimeSpent <- 15 #minutes;
+	list actions update: (fNeed > 0 and mayLunch = true)?["lunch"]:[];
 	
 //	reflex lunchingTime 
 	

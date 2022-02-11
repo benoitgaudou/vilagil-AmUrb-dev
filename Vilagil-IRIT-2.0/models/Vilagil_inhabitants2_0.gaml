@@ -35,7 +35,9 @@ experiment "Dayli" type: gui {
 			species people aspect:simple;
 			species FluxGen aspect:simple;
 			species car;
+			species bicycle;
 			species parkingPlace;
+			species bicyclePlace;
 		}
 
 	}
