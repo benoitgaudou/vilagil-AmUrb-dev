@@ -53,7 +53,10 @@ species people skills: [moving] {
 //		write of_generic_species(agents, environnement_entity) sum_of each.actions;
 		list listALaMano <- [];
 		ask of_generic_species(agents, environnement_entity){
-			listALaMano <- listALaMano + actions;
+			if self is greenSpace and fNeed = 0 {}
+			else {
+				listALaMano <- listALaMano + actions;
+			}
 		}
 		currentAction <- one_of(remove_duplicates(listALaMano));
 		do choose_entity (currentAction);

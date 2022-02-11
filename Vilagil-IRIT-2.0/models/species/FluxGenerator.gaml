@@ -29,6 +29,9 @@ global {
 		ask FluxGen where(each.name = "FluxGen6" or each.name = "FluxGen8"){
 			carCreator <- true;
 		}
+		ask greenSpace where(each.name = "greenspace3" or each.name = "greenspace4"){
+			mayLunch <- true;
+		}
 	}
 }
 
@@ -210,8 +213,12 @@ species parkingPlace parent:environnement_entity {
 
 species greenSpace parent:environnement_entity{
 	string type;
-	int averageTimeSpent <- 7;
-	list attendance <- [0,0,0,0,0,0,0,0,0,0,10,10,10,0,0,0,0,0,0,0,0,0,0,0];
+	list actions <- ["lunch"];
+	list attendance <- [0,0,0,0,0,0,0,0,10,10,15,15,15,10,0,0,0,0,0,0,0,0,0,0];
+	bool mayLunch <- false;
+	float averageTimeSpent <- 15 #minutes;
+	
+//	reflex lunchingTime 
 	
 	aspect default
 	{
