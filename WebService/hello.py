@@ -1,3 +1,4 @@
+from sqlite3 import Timestamp
 from flask import Flask,jsonify, request
 
 import  mqtt_client
@@ -5,7 +6,7 @@ import  mqtt_client
 app = Flask(__name__)
 
 @app.route("/peopleOnTheRoad")
-def hello_world():
+def peopleOnTheRoad():
     nbPeople = mqtt_client.__model.__getData__("peopleOnTheRoad")
 
     data = {
@@ -14,8 +15,28 @@ def hello_world():
 
     return jsonify(data)
 
+@app.route("/fluxGenList")
+def fluxGenList():
+    l = mqtt_client.__model.__getData__("fluxGenList")
+
+    data = {
+        "fluxGenList": l,
+    }
+
+    return jsonify(data)
+
+@app.route("/location/<id>")
+def location(id):
+    location = mqtt_client.__model.__getData__(str(id) + "location")
+
+    data = {
+        "location": location,
+    }
+
+    return jsonify(data)
+
 @app.route("/buildingList")
-def hello_world3():
+def buildingList():
     l = mqtt_client.__model.__getData__("buildingList")
 
     data = {
@@ -24,9 +45,59 @@ def hello_world3():
 
     return jsonify(data)
 
+@app.route("/parkingList")
+def parkingList():
+    l = mqtt_client.__model.__getData__("parkingList")
+
+    data = {
+        "parkingList": l,
+    }
+
+    return jsonify(data)
+
+@app.route("/busUse")
+def busUse():
+    l = mqtt_client.__model.__getData__("busUse")
+
+    data = {
+        "busUse": l,
+    }
+
+    return jsonify(data)
+
+@app.route("/worldShape")
+def worldShape():
+    l = mqtt_client.__model.__getData__("worldShape")
+
+    data = {
+        "WorldShape": l,
+    }
+
+    return jsonify(data)
+
+@app.route("/carUse")
+def carUse():
+    l = mqtt_client.__model.__getData__("carUse")
+
+    data = {
+        "carUse": l,
+    }
+
+    return jsonify(data)
+
+@app.route("/type/<id>")
+def building_type(id):
+    type = mqtt_client.__model.__getData__(str(id))
+
+    data = {
+        "type": type,
+    }
+
+    return jsonify(data)
+
 @app.route("/occupation/<id>")
-def hello_world2(id):
-    nbPeople = mqtt_client.__model.__getData__(str(id))
+def building_occupation(id):
+    nbPeople = mqtt_client.__model.__getData__(str(id) + "occupation")
 
     data = {
         "occupation": nbPeople,
@@ -34,35 +105,36 @@ def hello_world2(id):
 
     return jsonify(data)
 
+@app.route("/busFreq/<id>")
+def flux_gen_freq_bus(id):
+    bus = mqtt_client.__model.__getData__(str(id))
+
+    data = {
+        "Frequence des Bus": bus,
+    }
+
+    return jsonify(data)
+
 @app.route("/mailbox")
 def mailbox():
-    type = request.args.get('type')
-    data1 = request.args.get('data1')
-    data2 = request.args.get('data2')
-    if type == None: 
-        message = mqtt_client.__model.__getData__("mailbox")
+    message = mqtt_client.__model.__getData__("mailbox")
 
-        data = {
-            "mailbox": message,
-        }
+    data = {
+        "mailbox": message,
+    }
 
-        return jsonify(data)
-    elif data2 == None:
-        if type == "changeSteps":
-            timeStep = ''.join(filter(lambda x: x.isdigit(), data1)) + "#" + ''.join(filter(lambda x: not x.isdigit(), data1))
-            mqtt_client.client.publish("mailbox",str(type + " " + timeStep))
-        else :
-            mqtt_client.client.publish("mailbox",str(type + " " + data1))
-
-        return "Message Sent"
-    else :
-        mqtt_client.client.publish("mailbox",str(type + " " + data1 + " " + data2))
-
-        return "Message Sent"
+    return jsonify(data)
 
 @app.route("/mailbox/<msg>")
 def mailboxMsg(msg):
-    mqtt_client.client.publish("mailbox",str(msg).replace("&"," "))
+    message = str(msg).replace("&"," ")
+    tab = message.split(" ")
+    if tab[0] == "changeFreqBus":
+        tab[2] = ''.join(filter(lambda x: x.isdigit(), tab[2])) + "#" + ''.join(filter(lambda x: not x.isdigit(), tab[2]))
+        mqtt_client.client.publish("mailbox",str(tab[0] + " " + tab[1] + " " + tab[2]))
+        print(str(tab[0] + " " + tab[1] + " " + tab[2]))
+    else :
+        mqtt_client.client.publish("mailbox",message)
 
     return "Message Sent"
 
