@@ -45,7 +45,8 @@ global skills: [network]{
 	
 	float carPerCent <- 0.1;
 	float busPerCent <- 0.05;
-	int peopleInTheHour <- 150;
+	int dayliPeopleInTheHour <- 150;
+	int peopleInTheHour <- dayliPeopleInTheHour;
 	
 	bool allRestau <- false;
 	bool oneRestau <- false;
@@ -118,6 +119,7 @@ global skills: [network]{
 			do sendCarUse;
 			do sendWorldCoord;
 			do sendParking;
+			do sendPeopleByHour;
 		}
 		
 		reflex fetch when:has_more_message(){
@@ -135,22 +137,35 @@ global skills: [network]{
 						attendance <- [0,0,0,0,0,0,0,0,70,70,70,70,100,70,70,70,70,0,0,0,0,0,0,0];
 					}
 				}
+				do sendBuilding;
+			}
+			
+			if 'changePeopleByHour' in content{
+				dayliPeopleInTheHour <- content[1];
+//				write busPerCent;
+				ask world {
+					do fin;
+				}
+				do sendPeopleByHour;
 			}
 			
 			if 'changeBusUse' in content{
 				busPerCent <- float(content[1]);
-				write busPerCent;
+//				write busPerCent;
+				do sendBusUse;
 			}
 			
 			if 'changeCarUse' in content{
 				carPerCent <- float(content[1]);
-				write busPerCent;
+//				write busPerCent;
+				do sendCarUse;
 			}
 			
 			if 'changeFreqBus' in content{
 				ask FluxGen where(each.name=content[1]){
 					freqBus <- float(eval_gaml(content[2]));
 				}
+				do sendFluxGen;
 			}
 			
 			if 'createBuilding' in content{
@@ -201,6 +216,10 @@ global skills: [network]{
 			do send to:"static/metric/worldShape" contents:string(world.shape);
 		}
 		
+		action sendPeopleByHour {
+			do send to:"static/metric/peopleByHour" contents:string(peopleInTheHour);
+		}
+		
 		action sendParking {
 			list<string> parkName;
 			loop agt over: amenity where (each.type = "parking" or each.type = "bycicle_parking") {
@@ -224,8 +243,16 @@ global skills: [network]{
 		
 	}
 	
-	reflex fin when: current_date.hour > 17 {
-		peopleInTheHour <- 0;
+	reflex changeFreq {
+		do fin;
+	}
+	
+	action fin {
+		if current_date.hour > 17 or current_date.hour < 6 {
+			peopleInTheHour <- 0;
+		} else {
+			peopleInTheHour <- dayliPeopleInTheHour;
+		}
 	}
 	
 	reflex end_of_runs when: (current_date.hour = 19 and current_date.minute = 0){

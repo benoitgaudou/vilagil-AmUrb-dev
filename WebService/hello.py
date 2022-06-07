@@ -115,6 +115,16 @@ def flux_gen_freq_bus(id):
 
     return jsonify(data)
 
+@app.route("/peopleByHour")
+def people_by_h():
+    message = mqtt_client.__model.__getData__("peopleByHour")
+
+    data = {
+        "peopleByHour": message,
+    }
+
+    return jsonify(data)
+
 @app.route("/mailbox")
 def mailbox():
     message = mqtt_client.__model.__getData__("mailbox")

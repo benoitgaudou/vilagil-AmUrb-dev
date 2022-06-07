@@ -32,6 +32,13 @@ def on_message_bus_use(client, userdata, message):
         list1 += list(child.text.split())
     __model.__updateData__('busUse',list1)
 
+def on_message_people_by_hour(client, userdata, message):
+    root = unencryptGama(message)
+    list1 = []
+    for child in root.iter('string'):
+        list1 += list(child.text.split())
+    __model.__updateData__('peopleByHour',list1)
+
 def on_message_world_shape(client, userdata, message):
     root = unencryptGama(message)
     list1 = []
@@ -156,6 +163,7 @@ client.message_callback_add("static/buildings/type/#", on_message_building_type)
 client.message_callback_add("static/parking/type/#", on_message_parking_type)
 client.message_callback_add("static/metric/busUse", on_message_bus_use)
 client.message_callback_add("static/metric/carUse", on_message_car_use)
+client.message_callback_add("static/metric/peopleByHour", on_message_people_by_hour)
 client.message_callback_add("static/metric/worldShape", on_message_world_shape)
 client.message_callback_add("static/FluxGen/busFreq/#", on_message_bus_freq)
 client.message_callback_add("mailbox", on_message_mail)
