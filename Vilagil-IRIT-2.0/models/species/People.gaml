@@ -38,22 +38,26 @@ species people skills: [moving] {
 		do allUpdate;
 	}
 	
+	reflex kindOfStrange when :lAction at "goHome" = 0.0 {
+		lAction <- lAction + ["goHome"::0.01];
+	}
+	
 // Ressort de cette action les actions possibles, les batiments permettant l'action et le besoin de chaque batiment
 	action perceptible {
 		map<string,list<list>> pAction;
 		if egoiste = true {
-//			ask of_generic_species(agents, environnement_entity) where ((each.actions.keys contains_any types) and (each.available = true) and (distance_to(each, self) < champVisuel)){
-//				loop type over: myself.types {
-//					loop k over: actions at type {
-//						if pAction at k = nil {
-//							pAction <- pAction + [k::[[self,fNeed]]];
-//						} else {
-//							pAction <- pAction + [k::(pAction at k) + [[self, fNeed]]];
-//						}
-//					}
-//				}
-//			}
-//			do desirable(pAction);
+			ask of_generic_species(agents, environnement_entity) where ((each.actions.keys contains_any types) and (each.available = true) and (distance_to(each, self) < champVisuel)){
+				loop type over: myself.types {
+					loop k over: actions at type {
+						if pAction at k = nil {
+							pAction <- pAction + [k::[[self,fNeed]]];
+						} else {
+							pAction <- pAction + [k::(pAction at k) + [[self, fNeed]]];
+						}
+					}
+				}
+			}
+			do desirable(pAction);
 		} else {
 			ask of_generic_species(agents, environnement_entity) where ((each.actions.keys contains_any types) and (each.available = true) and (distance_to(each, self) < champVisuel)){
 				loop type over: myself.types {
@@ -79,7 +83,9 @@ species people skills: [moving] {
 		if egoiste = false {
 			map<string,list<list>> dAction;
 			loop k over: pAction.keys {
+				if lAction at k > 0.0 {
 					dAction <- dAction + [k::(pAction at k)] ;
+				}
 			}
 			do utile(dAction);
 		} else {
@@ -94,6 +100,7 @@ species people skills: [moving] {
 			mostNeed <- [(mostNeed at 0), float(mostNeed at 1)];
 			uAction <- uAction + [string(k)::mostNeed];
 		}
+		write [index_of(uAction, uAction with_max_of float(each at 1)), (uAction with_max_of float(each at 1))[0]];
 		return [index_of(uAction, uAction with_max_of float(each at 1)), (uAction with_max_of float(each at 1))[0]];
 	}
 	
@@ -106,7 +113,7 @@ species people skills: [moving] {
 			if carOwner {
 				final_destination <- gamos;
 			} else {
-				write "ntm";
+				write "cc";
 //				final_destination <- one_of(FluxGen);
 			}
 			arrivee <- any_point_in(final_destination);
@@ -160,9 +167,9 @@ species people skills: [moving] {
 		do goto on:the_graph target:arrivee;
 	}
 	
-	reflex helpMeStepBroIMStuck when: current_edge = nil {
-		do die;
-	}
+//	reflex helpMeStepBroIMStuck when: current_edge = nil {
+//		do die;
+//	}
 	
 	action updateEatDesire {
 		if alreadyLunch = false {
@@ -185,7 +192,7 @@ species people skills: [moving] {
 }
 
 species student parent: people {
-	map<string,float> lAction <- ["study"::1.0, "goHome"::0.1, "eat"::0.0];
+	map<string,float> lAction <- ["study"::1.0, "goHome"::0.01, "eat"::0.0];
 	list<string> types <- ["student"];
 	map<string, rgb> activityColor <- ["study"::#bold, "goHome"::#gold, "eat"::#chocolate];
 	
@@ -210,7 +217,7 @@ species student parent: people {
 }
 
 species professor parent: people {
-	map<string,float> lAction <- ["work"::1.0, "goHome"::0.1, "eat"::0.0];
+	map<string,float> lAction <- ["work"::1.0, "goHome"::0.01, "eat"::0.0];
 	
 	action allUpdate {
 		do updateEatDesire;

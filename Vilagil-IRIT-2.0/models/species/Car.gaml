@@ -39,6 +39,7 @@ species car parent:environnement_entity skills:[moving]{
 					gamos <- myself;
 					myself.owner <- self;
 					do allUpdate;
+					lAction <- lAction + ["goHome"::0.01];
 					do perceptionDecision;
 				}
 			}

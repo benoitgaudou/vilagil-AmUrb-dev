@@ -18,7 +18,7 @@ global skills: [network]{
 	string mqtt_broker <- "localhost";
 	string sender_name <- "Simple Traffic";
 	
-	float step <- 1 #minutes;
+	float step <- 15 #minutes;
 	geometry shape <- envelope(shape_file("../includes/pointsflux/pointsFlux.shp"));
 	date starting_date <- date("08 00 00","HH mm ss");
 	
