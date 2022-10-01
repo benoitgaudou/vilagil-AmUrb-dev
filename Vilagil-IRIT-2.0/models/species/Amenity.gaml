@@ -12,6 +12,8 @@ import "Environnement_Entity.gaml"
 
 species amenity parent:environnement_entity{
 	string type;
+	string osm_id;
+	
 	bool availble <- true;
 	
 	aspect default

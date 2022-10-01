@@ -21,6 +21,7 @@ species building parent:environnement_entity{
 	int flats <- 2;
 	string type;
 	string name;
+	string osm_id;
 //	int maxPeopleInside;
 	map<string,list> actions <- ["student"::["study"], "professor"::["work"]];
 	list attendance <- [0,0,0,0,0,0,0,20,30,60,50,40,30,40,50,50,30,20,10,10,0,0,0,0];

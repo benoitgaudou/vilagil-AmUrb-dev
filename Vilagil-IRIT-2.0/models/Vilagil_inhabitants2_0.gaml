@@ -129,7 +129,7 @@ global skills: [network]{
 			write mess;
 			
 			if 'changeType' in content{
-				ask building where(each.name=content[1]){
+				ask building where(each.osm_id=content[1]){
 					actions <- actions + ["student"::[content[2]]] + ["professor"::[content[2]]];
 					if content[2] = "study" {
 						attendance <- [0,0,0,0,0,0,0,20,30,60,50,40,30,40,50,50,30,20,10,10,0,0,0,0];
@@ -174,19 +174,26 @@ global skills: [network]{
 		   		}
 		   		do sendBuilding;
 			}
+			
+//			if 'getBuilding' in content{
+//				building chosen_building <- first(building overlapping point(int(content[1]),int(content[2])));				
+//		   		do sendBuilding;
+//			}			
 		}
 		
 		reflex toSend {
 			do send to:"dynamic/metric/peopleOnTheRoad" contents:people_on_the_road;
 		}
 		
+//		action sendChosenBuilding(float)
+		
 		action sendBuilding{
 			list<string> buildingName;
 			loop agt over: building {
-				buildingName <- buildingName + agt.name;
-				string topic_path <- "static/buildings/type/"+agt.name;
+				buildingName <- buildingName + agt.osm_id;
+				string topic_path <- "static/buildings/type/"+agt.osm_id;
 				do send to:topic_path contents:[agt.actions at "student"];
-				topic_path <- "static/buildings/location/"+agt.name;
+				topic_path <- "static/buildings/location/"+agt.osm_id;
 				do send to:topic_path contents:[[string(agt.location.x) + "," + string(agt.location.y)]];
 			}
 			do send to:"static/buildings/list" contents:buildingName;
@@ -223,8 +230,8 @@ global skills: [network]{
 		action sendParking {
 			list<string> parkName;
 			loop agt over: amenity where (each.type = "parking" or each.type = "bycicle_parking") {
-				parkName <- parkName + agt.name;
-				string topic_path <- "static/parking/type/"+agt.name;
+				parkName <- parkName + agt.osm_id;
+				string topic_path <- "static/parking/type/"+agt.osm_id;
 				do send to:topic_path contents:[agt.type];
 			}
 			do send to:"static/parking/list" contents:parkName;
@@ -232,11 +239,11 @@ global skills: [network]{
 		
 		reflex sendOccupation when: every(#hour){
 			loop agt over: amenity where (each.type = "parking" or each.type = "bycicle_parking") {
-				string topic_path <- "dynamic/parking/occupation/"+agt.name;
+				string topic_path <- "dynamic/parking/occupation/"+agt.osm_id;
 				do send to:topic_path contents:[[string(agt.building_occupation)]];
 			}
 			loop agt over: building{
-				string topic_path <- "dynamic/buildings/occupation/"+agt.name;
+				string topic_path <- "dynamic/buildings/occupation/"+agt.osm_id;
 				do send to:topic_path contents:[[string(agt.building_occupation)]];
 			}
 		}
